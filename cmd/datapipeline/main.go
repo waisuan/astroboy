@@ -1,15 +1,16 @@
-package datapipeline
+package main
 
 import (
+	"astroboy/internal/cache"
 	k "astroboy/internal/kafka"
 	s "astroboy/internal/sqs"
-	"github.com/segmentio/kafka-go"
-	"sync"
+	"fmt"
+	"time"
 )
 
-var Memory sync.Map
+func main() {
+	cacheCli := cache.NewCache()
 
-func Run() {
 	sqsCli := s.NewSqsCli()
 
 	sqsMailbox := make(chan string)
@@ -29,15 +30,9 @@ func Run() {
 
 	go kafkaCli.ConsumeMessage(kafkaMailbox)
 
-	err = kafkaCli.ProduceMessage(kafka.Message{
-		Key:   []byte("Some-Key"),
-		Value: []byte("Hello, Universe!"),
-	})
-	if err != nil {
-		panic(err)
-	}
-
 	for {
+		fmt.Println("Waiting for messages...")
+
 		kafkaMessage := <-kafkaMailbox
 
 		err = sqsCli.SendMessage(kafkaMessage)
@@ -46,6 +41,10 @@ func Run() {
 		}
 
 		sqsMessage := <-sqsMailbox
-		Memory.Store("LatestMessage", sqsMessage)
+
+		err := cacheCli.Set("latest_message", sqsMessage, 1*time.Hour)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
