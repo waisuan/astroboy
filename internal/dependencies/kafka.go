@@ -1,4 +1,4 @@
-package kafka
+package dependencies
 
 import (
 	"context"
@@ -8,15 +8,15 @@ import (
 	"strconv"
 )
 
-const TOPIC = "my-topic"
-
 type KafkaCli struct {
+	cfg  *Config
 	addr string
 }
 
-func NewKafkaCli() *KafkaCli {
+func NewKafkaCli(cfg *Config) *KafkaCli {
 	return &KafkaCli{
-		addr: "localhost:29092",
+		cfg:  cfg,
+		addr: cfg.KafkaBrokerAddr,
 	}
 }
 
@@ -40,7 +40,7 @@ func (k *KafkaCli) CreateTopic() error {
 
 	topicConfigs := []kafka.TopicConfig{
 		{
-			Topic:             TOPIC,
+			Topic:             k.cfg.KafkaTopic,
 			NumPartitions:     1,
 			ReplicationFactor: 1,
 		},
@@ -58,7 +58,7 @@ func (k *KafkaCli) ConsumeMessage(mailbox chan string) error {
 	// make a new reader that consumes from topic-A, partition 0, at offset 42
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:   []string{k.addr},
-		Topic:     TOPIC,
+		Topic:     k.cfg.KafkaTopic,
 		Partition: 0,
 		MaxBytes:  10e6, // 10MB
 	})
@@ -86,7 +86,7 @@ func (k *KafkaCli) ProduceMessage(msgs kafka.Message) error {
 	// make a writer that produces to topic-A, using the least-bytes distribution
 	w := &kafka.Writer{
 		Addr:     kafka.TCP(k.addr),
-		Topic:    TOPIC,
+		Topic:    k.cfg.KafkaTopic,
 		Balancer: &kafka.LeastBytes{},
 	}
 

@@ -4,6 +4,8 @@ go 1.20
 
 require (
 	github.com/aws/aws-sdk-go v1.45.2
+	github.com/caarlos0/env/v9 v9.0.0
+	github.com/joho/godotenv v1.5.1
 	github.com/redis/go-redis/v9 v9.1.0
 	github.com/segmentio/kafka-go v0.4.42
 	github.com/stretchr/testify v1.8.4

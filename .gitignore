@@ -1,2 +1,4 @@
 .idea
 datapipeline.PID
+.env.dev
+.env.test

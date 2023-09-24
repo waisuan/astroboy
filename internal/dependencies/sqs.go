@@ -1,4 +1,4 @@
-package sqs
+package dependencies
 
 import (
 	"github.com/aws/aws-sdk-go/aws"
@@ -6,28 +6,28 @@ import (
 	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
-const QUEUE_URL = "http://localhost:4566/000000000000/test-q"
-
 type SqsCli struct {
+	cfg  *Config
 	conn *sqs.SQS
 }
 
-func NewSqsCli() *SqsCli {
-	cfg := aws.Config{
-		Region:   aws.String("eu-west-1"),
-		Endpoint: aws.String("http://localhost:4566/"),
+func NewSqsCli(cfg *Config) *SqsCli {
+	awsCfg := aws.Config{
+		Region:   aws.String(cfg.AwsRegion),
+		Endpoint: aws.String(cfg.AwsSqsEndpoint),
 	}
 
-	sess := session.Must(session.NewSession(&cfg))
+	sess := session.Must(session.NewSession(&awsCfg))
 
 	return &SqsCli{
+		cfg:  cfg,
 		conn: sqs.New(sess),
 	}
 }
 
 func (s *SqsCli) SendMessage(msg string) error {
 	message := &sqs.SendMessageInput{
-		QueueUrl:    aws.String(QUEUE_URL),
+		QueueUrl:    aws.String(s.cfg.SqsQueueUrl),
 		MessageBody: aws.String(msg),
 	}
 
@@ -37,7 +37,7 @@ func (s *SqsCli) SendMessage(msg string) error {
 
 func (s *SqsCli) ReceiveMessage(mailbox chan string) error {
 	param := &sqs.ReceiveMessageInput{
-		QueueUrl: aws.String(QUEUE_URL),
+		QueueUrl: aws.String(s.cfg.SqsQueueUrl),
 	}
 
 	for {
@@ -50,7 +50,7 @@ func (s *SqsCli) ReceiveMessage(mailbox chan string) error {
 			mailbox <- *v.Body
 
 			_, err = s.conn.DeleteMessage(&sqs.DeleteMessageInput{
-				QueueUrl:      aws.String(QUEUE_URL),
+				QueueUrl:      aws.String(s.cfg.SqsQueueUrl),
 				ReceiptHandle: v.ReceiptHandle,
 			})
 		}

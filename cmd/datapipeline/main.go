@@ -1,26 +1,20 @@
 package main
 
 import (
-	"astroboy/internal/cache"
-	k "astroboy/internal/kafka"
-	s "astroboy/internal/sqs"
+	"astroboy/internal/dependencies"
 	"fmt"
 	"time"
 )
 
 func main() {
-	cacheCli := cache.NewCache()
-
-	sqsCli := s.NewSqsCli()
+	deps := dependencies.Init()
 
 	sqsMailbox := make(chan string)
 	defer close(sqsMailbox)
 
-	go sqsCli.ReceiveMessage(sqsMailbox)
+	go deps.SqsCli.ReceiveMessage(sqsMailbox)
 
-	kafkaCli := k.NewKafkaCli()
-
-	err := kafkaCli.CreateTopic()
+	err := deps.KafkaCli.CreateTopic()
 	if err != nil {
 		panic(err)
 	}
@@ -28,21 +22,21 @@ func main() {
 	kafkaMailbox := make(chan string)
 	defer close(kafkaMailbox)
 
-	go kafkaCli.ConsumeMessage(kafkaMailbox)
+	go deps.KafkaCli.ConsumeMessage(kafkaMailbox)
 
 	for {
 		fmt.Println("Waiting for messages...")
 
 		kafkaMessage := <-kafkaMailbox
 
-		err = sqsCli.SendMessage(kafkaMessage)
+		err = deps.SqsCli.SendMessage(kafkaMessage)
 		if err != nil {
 			panic(err)
 		}
 
 		sqsMessage := <-sqsMailbox
 
-		err := cacheCli.Set("latest_message", sqsMessage, 1*time.Hour)
+		err := deps.CacheCli.Set("latest_message", sqsMessage, 1*time.Hour)
 		if err != nil {
 			panic(err)
 		}

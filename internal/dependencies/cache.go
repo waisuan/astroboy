@@ -1,4 +1,4 @@
-package cache
+package dependencies
 
 import (
 	"context"
@@ -9,12 +9,13 @@ import (
 var ctx = context.Background()
 
 type Cache struct {
+	cfg  *Config
 	conn *redis.Client
 }
 
-func NewCache() *Cache {
+func NewCache(cfg *Config) *Cache {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     cfg.RedisAddr,
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})

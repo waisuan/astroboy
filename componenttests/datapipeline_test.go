@@ -1,31 +1,30 @@
 package componenttests
 
 import (
-	"astroboy/internal/cache"
-	k "astroboy/internal/kafka"
+	"astroboy/internal/dependencies"
 	"github.com/segmentio/kafka-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"os"
 	"testing"
 	"time"
 )
 
 func TestDataPipeline(t *testing.T) {
 	a := assert.New(t)
+	os.Setenv("APP_ENV", "test")
 
-	kafkaCli := k.NewKafkaCli()
+	deps := dependencies.Init()
 
-	err := kafkaCli.ProduceMessage(kafka.Message{
+	err := deps.KafkaCli.ProduceMessage(kafka.Message{
 		Key:   []byte("Some-Key"),
 		Value: []byte("Hello, Universe!"),
 	})
 	a.Nil(err)
 
-	cacheCli := cache.NewCache()
-
 	found := false
 	for i := 0; i < 5; i++ {
-		v, err := cacheCli.Get("latest_message")
+		v, err := deps.CacheCli.Get("latest_message")
 		require.Nil(t, err)
 
 		if v != "" {
