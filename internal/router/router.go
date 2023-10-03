@@ -1,12 +1,12 @@
 package router
 
 import (
-	"astroboy/internal/webhandlers"
+	"astroboy/internal/webhandler"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func New(wh *webhandlers.WebHandler) *echo.Echo {
+func New(wh *webhandler.WebHandler) *echo.Echo {
 	e := echo.New()
 
 	e.Use(middleware.Logger())
@@ -17,7 +17,6 @@ func New(wh *webhandlers.WebHandler) *echo.Echo {
 	apiGroup := e.Group("/api")
 
 	userGroup := apiGroup.Group("/users")
-	userGroup.GET("", wh.GetAllUsers)
 	userGroup.GET("/:username", wh.GetUser)
 
 	return e

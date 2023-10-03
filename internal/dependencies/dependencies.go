@@ -2,7 +2,7 @@ package dependencies
 
 type Dependencies struct {
 	Config   *Config
-	CacheCli *Cache
+	CacheCli ICache
 	SqsCli   *SqsCli
 	KafkaCli *KafkaCli
 }

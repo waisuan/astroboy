@@ -8,6 +8,11 @@ import (
 
 var ctx = context.Background()
 
+type ICache interface {
+	Get(key string) (string, error)
+	Set(key string, value interface{}, ttl time.Duration) error
+}
+
 type Cache struct {
 	cfg  *Config
 	conn *redis.Client
