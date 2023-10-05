@@ -1,4 +1,4 @@
 .idea
-datapipeline.PID
+*.PID
 .env.dev
 .env.test

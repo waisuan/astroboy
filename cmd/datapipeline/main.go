@@ -2,6 +2,8 @@ package main
 
 import (
 	"astroboy/internal/dependencies"
+	"astroboy/internal/model"
+	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -36,9 +38,23 @@ func main() {
 
 		sqsMessage := <-sqsMailbox
 
-		err := deps.CacheCli.Set("latest_message", sqsMessage, 1*time.Hour)
+		var m model.Message
+		err = json.Unmarshal([]byte(sqsMessage), &m)
 		if err != nil {
 			panic(err)
+		}
+
+		switch m.T {
+		case "user":
+			err := deps.CacheCli.Set(m.Key, m.Payload, 1*time.Hour)
+			if err != nil {
+				panic(err)
+			}
+		default:
+			err := deps.CacheCli.Set("latest_message", m.Payload, 1*time.Hour)
+			if err != nil {
+				panic(err)
+			}
 		}
 	}
 }

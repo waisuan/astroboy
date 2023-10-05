@@ -2,10 +2,15 @@ package componenttests
 
 import (
 	"astroboy/internal/dependencies"
+	"astroboy/internal/model"
+	"encoding/json"
 	"github.com/segmentio/kafka-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"io"
+	"net/http"
 	"os"
+	"strings"
 	"testing"
 	"time"
 )
@@ -16,19 +21,39 @@ func TestDataPipeline(t *testing.T) {
 
 	deps := dependencies.Init()
 
+	user := model.User{
+		Username:    "esia",
+		Email:       "e-sia@outlook.com",
+		DateOfBirth: "12/11/1991",
+	}
+	uj, _ := json.Marshal(user)
+
+	m := model.Message{
+		T:       "user",
+		Key:     "esia",
+		Payload: string(uj),
+	}
+	mj, _ := json.Marshal(m)
+
 	err := deps.KafkaCli.ProduceMessage(kafka.Message{
-		Key:   []byte("Some-Key"),
-		Value: []byte("Hello, Universe!"),
+		Value: mj,
 	})
-	a.Nil(err)
+	require.Nil(t, err)
 
 	found := false
 	for i := 0; i < 5; i++ {
-		v, err := deps.CacheCli.Get("latest_message")
+		req, err := http.NewRequest(http.MethodGet, "http://localhost:1323/api/users/esia", nil)
 		require.Nil(t, err)
 
-		if v != "" {
-			a.Equal("Hello, Universe!", v)
+		res, err := http.DefaultClient.Do(req)
+		require.Nil(t, err)
+
+		if res != nil {
+			resBody, err := io.ReadAll(res.Body)
+			a.Nil(err)
+			a.Equal(http.StatusOK, res.StatusCode)
+			a.Equal(string(uj), strings.TrimSuffix(string(resBody), "\n"))
+
 			found = true
 			break
 		}

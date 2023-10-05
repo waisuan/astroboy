@@ -14,15 +14,16 @@ import (
 
 func TestWebHandler_GetUser(t *testing.T) {
 	assert := testify.New(t)
-	e := echo.New()
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
-	c.SetPath("/users/:username")
-	c.SetParamNames("username")
-	c.SetParamValues("esia")
 
 	t.Run("user exists", func(t *testing.T) {
+		e := echo.New()
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		c.SetPath("/users/:username")
+		c.SetParamNames("username")
+		c.SetParamValues("esia")
+
 		mockCtrl := gomock.NewController(t)
 		defer mockCtrl.Finish()
 
@@ -50,6 +51,14 @@ func TestWebHandler_GetUser(t *testing.T) {
 	})
 
 	t.Run("user does not exist", func(t *testing.T) {
+		e := echo.New()
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		c.SetPath("/users/:username")
+		c.SetParamNames("username")
+		c.SetParamValues("esia")
+
 		mockCtrl := gomock.NewController(t)
 		defer mockCtrl.Finish()
 
@@ -65,6 +74,14 @@ func TestWebHandler_GetUser(t *testing.T) {
 	})
 
 	t.Run("unable to parse the response", func(t *testing.T) {
+		e := echo.New()
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		c.SetPath("/users/:username")
+		c.SetParamNames("username")
+		c.SetParamValues("esia")
+
 		mockCtrl := gomock.NewController(t)
 		defer mockCtrl.Finish()
 
