@@ -27,6 +27,12 @@ teardown:
 	sudo docker compose -f docker-compose-storage.yml down
 	sudo docker compose -f docker-compose-localstack.yml down
 	sudo docker compose -f docker-compose-kafka.yml down
+	if [ -e datapipeline.PID ]; then \
+		kill -TERM $$(cat datapipeline.PID) || true; \
+	fi;
+	if [ -e web.PID ]; then \
+		kill -TERM $$(cat web.PID) || true; \
+	fi;
 
 dummy:
 	go run cmd/datapipeline/main.go & echo $$! > dummy.PID;

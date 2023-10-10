@@ -42,7 +42,7 @@ func TestDataPipeline(t *testing.T) {
 
 	found := false
 	for i := 0; i < 5; i++ {
-		req, err := http.NewRequest(http.MethodGet, "http://localhost:1323/api/users/esia", nil)
+		req, err := http.NewRequest(http.MethodGet, "http://localhost:1324/api/users/esia", nil)
 		require.Nil(t, err)
 
 		res, err := http.DefaultClient.Do(req)
