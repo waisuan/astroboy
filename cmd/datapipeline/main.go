@@ -4,7 +4,7 @@ import (
 	"astroboy/internal/dependencies"
 	"astroboy/internal/model"
 	"encoding/json"
-	"fmt"
+	"log"
 	"time"
 )
 
@@ -27,7 +27,7 @@ func main() {
 	go deps.KafkaCli.ConsumeMessage(kafkaMailbox)
 
 	for {
-		fmt.Println("Waiting for messages...")
+		log.Println("Waiting for messages...")
 
 		kafkaMessage := <-kafkaMailbox
 

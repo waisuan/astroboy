@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/segmentio/kafka-go"
+	"log"
 	"net"
 	"strconv"
 )
@@ -67,10 +68,10 @@ func (k *KafkaCli) ConsumeMessage(mailbox chan string) error {
 	for {
 		m, err := r.ReadMessage(context.Background())
 		if err != nil {
-			fmt.Println(fmt.Errorf("failed to read message: %e", err))
+			log.Println(fmt.Errorf("failed to read message: %e", err))
 			break
 		}
-		fmt.Printf("message at offset %d: %s = %s\n", m.Offset, string(m.Key), string(m.Value))
+		log.Printf("message at offset %d: %s = %s\n", m.Offset, string(m.Key), string(m.Value))
 
 		mailbox <- string(m.Value)
 	}
@@ -90,18 +91,6 @@ func (k *KafkaCli) ProduceMessage(msgs kafka.Message) error {
 		Balancer: &kafka.LeastBytes{},
 	}
 
-	//kafka.Message{
-	//	Key:   []byte("Key-A"),
-	//	Value: []byte("Hello World!"),
-	//},
-	//	kafka.Message{
-	//		Key:   []byte("Key-B"),
-	//		Value: []byte("One!"),
-	//	},
-	//	kafka.Message{
-	//		Key:   []byte("Key-C"),
-	//		Value: []byte("Two!"),
-	//	},
 	err := w.WriteMessages(context.Background(), msgs)
 	if err != nil {
 		return err
