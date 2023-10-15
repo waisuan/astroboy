@@ -10,7 +10,7 @@ import (
 func main() {
 	deps := dependencies.Init()
 
-	w := workers.NewJobEnqueuer(deps)
+	w := workers.NewJobEnqueuer(deps.CacheCli)
 
 	w.Pool.Start()
 
