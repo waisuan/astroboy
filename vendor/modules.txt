@@ -43,6 +43,10 @@ github.com/aws/aws-sdk-go/service/sso/ssoiface
 github.com/aws/aws-sdk-go/service/ssooidc
 github.com/aws/aws-sdk-go/service/sts
 github.com/aws/aws-sdk-go/service/sts/stsiface
+# github.com/brianvoe/gofakeit/v6 v6.23.2
+## explicit; go 1.17
+github.com/brianvoe/gofakeit/v6
+github.com/brianvoe/gofakeit/v6/data
 # github.com/caarlos0/env/v9 v9.0.0
 ## explicit; go 1.17
 github.com/caarlos0/env/v9
