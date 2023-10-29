@@ -11,12 +11,13 @@ import (
 )
 
 type Config struct {
-	AwsSqsEndpoint  string `env:"AWS_SQS_ENDPOINT"`
-	AwsRegion       string `env:"AWS_REGION"`
-	SqsQueueUrl     string `env:"SQS_QUEUE_URL"`
-	KafkaBrokerAddr string `env:"KAFKA_BROKER_ADDR"`
-	KafkaTopic      string `env:"KAFKA_TOPIC"`
-	RedisAddr       string `env:"REDIS_ADDR"`
+	AwsSqsEndpoint        string `env:"AWS_SQS_ENDPOINT"`
+	AwsRegion             string `env:"AWS_REGION"`
+	SqsQueueUrl           string `env:"SQS_QUEUE_URL"`
+	KafkaBrokerAddr       string `env:"KAFKA_BROKER_ADDR"`
+	KafkaTopic            string `env:"KAFKA_TOPIC"`
+	RedisAddr             string `env:"REDIS_ADDR"`
+	FakeDataPublisherCron string `env:"FAKE_DATA_PUBLISHER_CRON"`
 }
 
 func LoadEnv() *Config {

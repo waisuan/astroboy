@@ -1,16 +1,21 @@
 package main
 
 import (
-	"github.com/brianvoe/gofakeit/v6"
-	"log"
+	"fmt"
 	"time"
 )
 
 func main() {
-	log.Println(gofakeit.Name())
-	log.Println(gofakeit.Email())
+	c1 := make(chan string, 1)
+	go func() {
+		time.Sleep(2 * time.Second)
+		c1 <- "result 1"
+	}()
 
-	startDate, _ := time.Parse("2006-01-02", "1980-01-01")
-	endDate, _ := time.Parse("2006-01-02", "2010-01-01")
-	log.Println(gofakeit.DateRange(startDate, endDate))
+	select {
+	case res := <-c1:
+		fmt.Println(res)
+	case <-time.After(10 * time.Second):
+		fmt.Println("timeout 1")
+	}
 }

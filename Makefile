@@ -35,8 +35,8 @@ teardown:
 	fi;
 
 dummy:
-	go run cmd/datapipeline/main.go & echo $$! > dummy.PID;
-	sleep 5
+	go run cmd/jobrunner/main.go & echo $$! > dummy.PID;
+	sleep 900
 	if [ -e dummy.PID ]; then \
 		kill -TERM $$(cat dummy.PID) || true; \
 	fi;

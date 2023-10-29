@@ -11,10 +11,10 @@ type JobEnqueuer struct {
 	Pool *work.WorkerPool
 }
 
-func NewJobEnqueuer(cache dependencies.ICache) *JobEnqueuer {
-	pool := work.NewWorkerPool(Context{}, 1, "dummy_namespace", cache.Pool())
+func NewJobEnqueuer(deps *dependencies.Dependencies) *JobEnqueuer {
+	pool := work.NewWorkerPool(Context{}, 1, "dummy_namespace", deps.CacheCli.Pool())
 
-	registerSchedule(pool)
+	registerSchedule(pool, deps.Config)
 	registerJobs(pool)
 
 	return &JobEnqueuer{
@@ -22,8 +22,8 @@ func NewJobEnqueuer(cache dependencies.ICache) *JobEnqueuer {
 	}
 }
 
-func registerSchedule(pool *work.WorkerPool) {
-	pool.PeriodicallyEnqueue("0 */3 * * * *", "publish_fake_data")
+func registerSchedule(pool *work.WorkerPool, cfg *dependencies.Config) {
+	pool.PeriodicallyEnqueue(cfg.FakeDataPublisherCron, "publish_fake_data")
 }
 
 func registerJobs(pool *work.WorkerPool) {
