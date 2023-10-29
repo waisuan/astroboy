@@ -56,14 +56,12 @@ func (k *KafkaCli) CreateTopic() error {
 }
 
 func (k *KafkaCli) ConsumeMessage(mailbox chan string) error {
-	// make a new reader that consumes from topic-A, partition 0, at offset 42
 	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:   []string{k.addr},
-		Topic:     k.cfg.KafkaTopic,
-		Partition: 0,
-		MaxBytes:  10e6, // 10MB
+		Brokers:  []string{k.addr},
+		GroupID:  "astroboy-group",
+		Topic:    k.cfg.KafkaTopic,
+		MaxBytes: 10e6, // 10MB
 	})
-	//r.SetOffset(42)
 
 	for {
 		m, err := r.ReadMessage(context.Background())

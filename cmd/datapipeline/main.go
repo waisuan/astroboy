@@ -14,7 +14,12 @@ func main() {
 	sqsMailbox := make(chan string)
 	defer close(sqsMailbox)
 
-	go deps.SqsCli.ReceiveMessage(sqsMailbox)
+	go func() {
+		err := deps.SqsCli.ReceiveMessage(sqsMailbox)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	err := deps.KafkaCli.CreateTopic()
 	if err != nil {
@@ -24,7 +29,12 @@ func main() {
 	kafkaMailbox := make(chan string)
 	defer close(kafkaMailbox)
 
-	go deps.KafkaCli.ConsumeMessage(kafkaMailbox)
+	go func() {
+		err := deps.KafkaCli.ConsumeMessage(kafkaMailbox)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	for {
 		log.Println("Waiting for messages...")
