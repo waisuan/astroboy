@@ -1,1 +1,1 @@
-web: astroboy-web
+web: web
