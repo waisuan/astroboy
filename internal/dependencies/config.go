@@ -3,11 +3,10 @@ package dependencies
 import (
 	"fmt"
 	"github.com/caarlos0/env/v9"
+	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"path/filepath"
-
-	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -23,14 +22,12 @@ type Config struct {
 func LoadEnv() *Config {
 	appEnv := os.Getenv("APP_ENV")
 
-	if "" == appEnv {
-		appEnv = "dev"
-	}
-
-	log.Printf("Loading %s config\n", appEnv)
-	err := godotenv.Load(dir(".env." + appEnv))
-	if err != nil {
-		log.Fatalf("error loading app config: %v", err.Error())
+	if "" != appEnv {
+		log.Printf("Loading %s config\n", appEnv)
+		err := godotenv.Load(dir(".env." + appEnv))
+		if err != nil {
+			log.Fatalf("error loading app config: %v", err.Error())
+		}
 	}
 
 	cfg := Config{}
