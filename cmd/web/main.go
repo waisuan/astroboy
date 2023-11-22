@@ -11,5 +11,5 @@ func main() {
 	wh := webhandler.NewWebHandler(deps)
 	r := router.New(wh)
 
-	r.Logger.Fatal(r.Start(":5000"))
+	r.Logger.Fatal(r.Start(":" + deps.Config.WebPort))
 }

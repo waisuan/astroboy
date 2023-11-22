@@ -17,6 +17,7 @@ type Config struct {
 	KafkaTopic            string `env:"KAFKA_TOPIC"`
 	RedisAddr             string `env:"REDIS_ADDR"`
 	FakeDataPublisherCron string `env:"FAKE_DATA_PUBLISHER_CRON"`
+	WebPort               string `env:"PORT" envDefault:"5000"`
 }
 
 func LoadEnv() *Config {
