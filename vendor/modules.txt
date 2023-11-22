@@ -43,10 +43,6 @@ github.com/aws/aws-sdk-go/service/sso/ssoiface
 github.com/aws/aws-sdk-go/service/ssooidc
 github.com/aws/aws-sdk-go/service/sts
 github.com/aws/aws-sdk-go/service/sts/stsiface
-# github.com/brianvoe/gofakeit/v6 v6.23.2
-## explicit; go 1.17
-github.com/brianvoe/gofakeit/v6
-github.com/brianvoe/gofakeit/v6/data
 # github.com/caarlos0/env/v9 v9.0.0
 ## explicit; go 1.17
 github.com/caarlos0/env/v9
@@ -59,9 +55,6 @@ github.com/davecgh/go-spew/spew
 # github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f
 ## explicit
 github.com/dgryski/go-rendezvous
-# github.com/gocraft/work v0.5.1
-## explicit
-github.com/gocraft/work
 # github.com/golang-jwt/jwt v3.2.2+incompatible
 ## explicit
 github.com/golang-jwt/jwt
@@ -126,9 +119,6 @@ github.com/redis/go-redis/v9/internal/pool
 github.com/redis/go-redis/v9/internal/proto
 github.com/redis/go-redis/v9/internal/rand
 github.com/redis/go-redis/v9/internal/util
-# github.com/robfig/cron v1.2.0
-## explicit
-github.com/robfig/cron
 # github.com/segmentio/kafka-go v0.4.42
 ## explicit; go 1.15
 github.com/segmentio/kafka-go
