@@ -4,10 +4,13 @@ import (
 	"astroboy/internal/model"
 	"encoding/json"
 	"github.com/labstack/echo/v4"
+	"log"
 	"net/http"
 )
 
 func (wh *WebHandler) GetUser(c echo.Context) error {
+	log.Printf("GetUser: %s\n", c.Param("username"))
+
 	var user model.User
 	if err := c.Bind(&user); err != nil {
 		return c.JSON(http.StatusBadRequest, CustomErrorResponse("bad request"))
