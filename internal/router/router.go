@@ -1,12 +1,12 @@
 package router
 
 import (
-	"astroboy/internal/webhandler"
+	"astroboy/internal/webhandlers"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func New(wh *webhandler.WebHandler) *echo.Echo {
+func New(wh *webhandlers.WebHandler) *echo.Echo {
 	e := echo.New()
 
 	e.Use(middleware.Logger())

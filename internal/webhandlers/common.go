@@ -1,4 +1,4 @@
-package webhandler
+package webhandlers
 
 type CustomError struct {
 	error string `json:"error"`

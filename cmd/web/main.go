@@ -3,12 +3,12 @@ package main
 import (
 	"astroboy/internal/dependencies"
 	"astroboy/internal/router"
-	"astroboy/internal/webhandler"
+	"astroboy/internal/webhandlers"
 )
 
 func main() {
 	deps := dependencies.Init()
-	wh := webhandler.NewWebHandler(deps)
+	wh := webhandlers.NewWebHandler(deps)
 	r := router.New(wh)
 
 	r.Logger.Fatal(r.Start(":" + deps.Config.WebPort))

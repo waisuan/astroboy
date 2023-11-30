@@ -1,4 +1,4 @@
-package webhandler
+package webhandlers
 
 import (
 	"astroboy/internal/dependencies"
