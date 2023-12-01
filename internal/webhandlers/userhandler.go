@@ -28,3 +28,7 @@ func (wh *WebHandler) GetUser(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, user)
 }
+
+func (wh *WebHandler) GetChatHistory(c echo.Context) error {
+	return c.JSON(http.StatusOK, nil)
+}

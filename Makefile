@@ -40,3 +40,6 @@ dummy:
 	if [ -e dummy.PID ]; then \
 		kill -TERM $$(cat dummy.PID) || true; \
 	fi;
+
+dev:
+	go run -tags dev -v cmd/web/main.go

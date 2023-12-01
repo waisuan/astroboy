@@ -18,10 +18,13 @@ type Config struct {
 	RedisAddr             string `env:"REDIS_ADDR"`
 	FakeDataPublisherCron string `env:"FAKE_DATA_PUBLISHER_CRON"`
 	WebPort               string `env:"PORT" envDefault:"5000"`
+	DevMode               bool   `env:"DEV_MODE" envDefault:"false"`
+	DbTableName           string `env:"DB_TABLE_NAME" envDefault:"astroboy-store"`
 }
 
 func LoadEnv() *Config {
 	appEnv := os.Getenv("APP_ENV")
+	cfg := Config{}
 
 	if "" != appEnv {
 		log.Printf("Loading %s config\n", appEnv)
@@ -29,9 +32,10 @@ func LoadEnv() *Config {
 		if err != nil {
 			log.Fatalf("error loading app config: %v", err.Error())
 		}
+
+		cfg.DevMode = true
 	}
 
-	cfg := Config{}
 	if err := env.Parse(&cfg); err != nil {
 		log.Fatalf("error loading app config: %v", err.Error())
 	}
