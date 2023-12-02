@@ -42,4 +42,7 @@ dummy:
 	fi;
 
 dev:
-	go run -tags dev -v cmd/web/main.go
+	APP_ENV=dev go run -tags dev -v cmd/web/main.go
+
+test-e2e:
+	APP_ENV=test go test -v -count=1 -tags e2e ./e2e

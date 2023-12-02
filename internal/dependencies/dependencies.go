@@ -1,5 +1,9 @@
 package dependencies
 
+import "context"
+
+var ctx = context.Background()
+
 type Dependencies struct {
 	Config   *Config
 	CacheCli ICache

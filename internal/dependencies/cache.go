@@ -1,13 +1,10 @@
 package dependencies
 
 import (
-	"context"
 	redispool "github.com/gomodule/redigo/redis"
 	"github.com/redis/go-redis/v9"
 	"time"
 )
-
-var ctx = context.Background()
 
 type ICache interface {
 	Get(key string) (string, error)

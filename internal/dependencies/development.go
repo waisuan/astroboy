@@ -1,9 +1,12 @@
+//go:build dev || e2e
+// +build dev e2e
+
 package dependencies
 
 import (
-	"context"
 	"fmt"
 	"github.com/testcontainers/testcontainers-go/wait"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -38,17 +41,30 @@ func init() {
 	go func() {
 		// also use the shutdown function when the SIGTERM or SIGINT signals are received
 		sig := <-gracefulStop
-		fmt.Printf("caught sig: %+v\n", sig)
-		//err := shutdownDependencies(runtimeDependencies...)
-		//if err != nil {
-		//	os.Exit(1)
-		//}
+		log.Printf("caught sig: %+v\n", sig)
+		err := shutdownDependencies(runtimeDependencies...)
+		if err != nil {
+			os.Exit(1)
+		}
 		os.Exit(0)
 	}()
 }
 
+// helper function to stop the dependencies
+func shutdownDependencies(containers ...testcontainers.Container) error {
+	for _, c := range containers {
+		err := c.Terminate(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to terminate container: %w", err)
+		}
+	}
+
+	return nil
+}
+
 func startDatabase() (testcontainers.Container, error) {
 	req := testcontainers.ContainerRequest{
+		Name: "astroboy-db-local",
 		// we're using the latest version of the image provided by Amazon
 		Image: "amazon/dynamodb-local:latest",
 		// be sure to use the commands as described in the documentation, but
@@ -65,13 +81,25 @@ func startDatabase() (testcontainers.Container, error) {
 	d, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: req,
 		Started:          true,
+		Reuse:            true,
 	})
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	defer d.Terminate(context.Background())
+	host, err := d.Host(ctx)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, nil
+	port, err := d.MappedPort(ctx, "8000")
+	if err != nil {
+		return nil, err
+	}
+
+	os.Setenv("DB_HOST", host)
+	os.Setenv("DB_PORT", port.Port())
+
+	return d, nil
 }

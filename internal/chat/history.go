@@ -3,10 +3,10 @@ package chat
 import (
 	"astroboy/internal/dependencies"
 	"context"
-	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
+	"log"
 )
 
 type HistoryService struct {
@@ -23,14 +23,14 @@ func (hs *HistoryService) ForUser(userId string) error {
 		IndexName:              aws.String(hs.deps.Db.UserIndexName),
 		KeyConditionExpression: aws.String("user_id = :userId"),
 		ExpressionAttributeValues: map[string]types.AttributeValue{
-			":userId": &types.AttributeValueMemberS{Value: "123"},
+			":userId": &types.AttributeValueMemberS{Value: userId},
 		},
 	})
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(out)
+	log.Printf("Result: %v\n", out.Items)
 
 	return nil
 }

@@ -20,6 +20,8 @@ type Config struct {
 	WebPort               string `env:"PORT" envDefault:"5000"`
 	DevMode               bool   `env:"DEV_MODE" envDefault:"false"`
 	DbTableName           string `env:"DB_TABLE_NAME" envDefault:"astroboy-store"`
+	DbHost                string `env:"DB_HOST" envDefault:"localhost"`
+	DbPort                string `env:"DB_PORT" envDefault:"8000"`
 }
 
 func LoadEnv() *Config {
