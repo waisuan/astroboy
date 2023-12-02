@@ -30,5 +30,10 @@ func (wh *WebHandler) GetUser(c echo.Context) error {
 }
 
 func (wh *WebHandler) GetChatHistory(c echo.Context) error {
-	return c.JSON(http.StatusOK, wh.historyService.ForUser(c.Param("username")))
+	res, err := wh.historyService.ForUser(c.Param("username"))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, CustomErrorResponse("failed to process request"))
+	}
+
+	return c.JSON(http.StatusOK, res)
 }

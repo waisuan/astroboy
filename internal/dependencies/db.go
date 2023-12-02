@@ -2,10 +2,10 @@ package dependencies
 
 import (
 	"fmt"
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/pkg/errors"
 	"log"
 	"time"
@@ -52,10 +52,16 @@ func InitDB(cfg *Config) *DB {
 	}
 }
 
+// <message_id> | <timestamp> | <user_id> | <convo_id> | <body>
+// - gsi: [user_id, timestamp]
+// - gsi: [convo_id, timestamp]
 func createTable(svc *dynamodb.Client, tableName string) error {
 	o, _ := svc.DescribeTable(ctx, &dynamodb.DescribeTableInput{TableName: aws.String(tableName)})
 	if o != nil && o.Table.TableStatus == types.TableStatusActive {
-		return nil
+		_, err := svc.DeleteTable(ctx, &dynamodb.DeleteTableInput{TableName: aws.String(tableName)})
+		if err != nil {
+			return errors.Wrap(err, "failed to drop table")
+		}
 	}
 
 	_, err := svc.CreateTable(ctx, &dynamodb.CreateTableInput{

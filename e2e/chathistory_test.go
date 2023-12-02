@@ -5,8 +5,10 @@ package e2e
 
 import (
 	"astroboy/internal/dependencies"
+	"astroboy/internal/model"
 	"astroboy/internal/webhandlers"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
@@ -40,9 +42,9 @@ func TestChatHistory(t *testing.T) {
 			TableName: aws.String(deps.Db.TableName),
 			Item: map[string]types.AttributeValue{
 				"message_id": &types.AttributeValueMemberS{Value: uuid.New().String()},
-				"timestamp":  &types.AttributeValueMemberN{Value: fmt.Sprintf("%d", time.Now().UnixNano())},
+				"created_at": &types.AttributeValueMemberN{Value: fmt.Sprintf("%d", time.Now().UnixNano())},
 				"body":       &types.AttributeValueMemberS{Value: "Hello, world!"},
-				"user_id":    &types.AttributeValueMemberS{Value: uuid.New().String()},
+				"user_id":    &types.AttributeValueMemberS{Value: "esia"},
 				"convo_id":   &types.AttributeValueMemberS{Value: uuid.New().String()},
 			},
 		})
@@ -52,5 +54,12 @@ func TestChatHistory(t *testing.T) {
 
 		assert.NoError(wh.GetChatHistory(c))
 		assert.Equal(http.StatusOK, rec.Code)
+
+		var chatMessages []model.ChatMessage
+		_ = json.Unmarshal([]byte(rec.Body.String()), &chatMessages)
+		must.Len(chatMessages, 1)
+
+		assert.Equal("Hello, world!", chatMessages[0].Body)
+		assert.Equal("esia", chatMessages[0].UserId)
 	})
 }
