@@ -1,9 +1,12 @@
 package dependencies
 
 import (
+	"context"
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/pkg/errors"
@@ -14,7 +17,15 @@ import (
 const (
 	UserGsiName  = "USER_GSI"
 	ConvoGsiName = "CONVO_GSI"
+	UserGsiPKey  = "user_id"
 )
+
+type IDatabase interface {
+	QueryWithIndex(ctx context.Context, indexName string, expr expression.Expression) (DbQueryOutput, error)
+	PutItem(ctx context.Context, input interface{}) error
+}
+
+type DbQueryOutput []map[string]types.AttributeValue
 
 type DB struct {
 	Client         *dynamodb.Client
@@ -152,4 +163,32 @@ func createTable(svc *dynamodb.Client, tableName string) error {
 	}
 
 	return nil
+}
+
+func (db *DB) QueryWithIndex(ctx context.Context, indexName string, expr expression.Expression) (DbQueryOutput, error) {
+	response, err := db.Client.Query(ctx, &dynamodb.QueryInput{
+		TableName:                 aws.String(db.TableName),
+		IndexName:                 aws.String(indexName),
+		ExpressionAttributeNames:  expr.Names(),
+		ExpressionAttributeValues: expr.Values(),
+		KeyConditionExpression:    expr.KeyCondition(),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Items, nil
+}
+
+func (db *DB) PutItem(ctx context.Context, input interface{}) error {
+	item, err := attributevalue.MarshalMap(input)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Client.PutItem(ctx, &dynamodb.PutItemInput{
+		TableName: aws.String(db.TableName), Item: item,
+	})
+
+	return err
 }

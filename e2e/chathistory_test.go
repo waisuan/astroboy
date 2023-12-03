@@ -9,10 +9,6 @@ import (
 	"astroboy/internal/webhandlers"
 	"context"
 	"encoding/json"
-	"fmt"
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	testify "github.com/stretchr/testify/assert"
@@ -38,16 +34,14 @@ func TestChatHistory(t *testing.T) {
 
 		deps := dependencies.Init()
 
-		_, err := deps.Db.Client.PutItem(context.TODO(), &dynamodb.PutItemInput{
-			TableName: aws.String(deps.Db.TableName),
-			Item: map[string]types.AttributeValue{
-				"message_id": &types.AttributeValueMemberS{Value: uuid.New().String()},
-				"created_at": &types.AttributeValueMemberN{Value: fmt.Sprintf("%d", time.Now().UnixNano())},
-				"body":       &types.AttributeValueMemberS{Value: "Hello, world!"},
-				"user_id":    &types.AttributeValueMemberS{Value: "esia"},
-				"convo_id":   &types.AttributeValueMemberS{Value: uuid.New().String()},
-			},
-		})
+		chatMsg := model.ChatMessage{
+			MessageId: uuid.New().String(),
+			CreatedAt: time.Now().UnixNano(),
+			Body:      "Hello, world!",
+			UserId:    "esia",
+			ConvoId:   uuid.New().String(),
+		}
+		err := deps.Db.PutItem(context.TODO(), chatMsg)
 		must.Nil(err)
 
 		wh := webhandlers.NewWebHandler(deps)

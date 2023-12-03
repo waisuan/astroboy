@@ -17,7 +17,6 @@ func New(wh *webhandlers.WebHandler) *echo.Echo {
 	apiGroup := e.Group("/api")
 
 	userGroup := apiGroup.Group("/users")
-	userGroup.GET("/:username", wh.GetUser)
 	userGroup.GET("/:username/chat-history", wh.GetChatHistory)
 
 	return e

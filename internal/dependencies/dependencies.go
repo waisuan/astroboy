@@ -9,25 +9,25 @@ type Dependencies struct {
 	CacheCli ICache
 	SqsCli   *SqsCli
 	KafkaCli *KafkaCli
-	Db       *DB
+	Db       IDatabase
 }
 
 func Init() *Dependencies {
 	cfg := LoadEnv()
 
-	sqsCli := NewSqsCli(cfg)
-
-	kafkaCli := NewKafkaCli(cfg)
-
-	cacheCli := NewCache(cfg)
+	//sqsCli := NewSqsCli(cfg)
+	//
+	//kafkaCli := NewKafkaCli(cfg)
+	//
+	//cacheCli := NewCache(cfg)
 
 	db := InitDB(cfg)
 
 	return &Dependencies{
-		Config:   cfg,
-		SqsCli:   sqsCli,
-		KafkaCli: kafkaCli,
-		CacheCli: cacheCli,
-		Db:       db,
+		Config: cfg,
+		//SqsCli:   sqsCli,
+		//KafkaCli: kafkaCli,
+		//CacheCli: cacheCli,
+		Db: db,
 	}
 }
