@@ -28,6 +28,9 @@ func (hs *HistoryService) ForUser(userId string) ([]model.ChatMessage, error) {
 	}
 
 	out, err := hs.deps.Db.QueryWithIndex(ctx, dependencies.UserGsiName, expr)
+	if err != nil {
+		return nil, err
+	}
 
 	var chatMessages []model.ChatMessage
 	err = attributevalue.UnmarshalListOfMaps(out, &chatMessages)

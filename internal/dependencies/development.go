@@ -38,6 +38,7 @@ func init() {
 	var gracefulStop = make(chan os.Signal)
 	signal.Notify(gracefulStop, syscall.SIGTERM)
 	signal.Notify(gracefulStop, syscall.SIGINT)
+	signal.Notify(gracefulStop, syscall.SIGKILL)
 	go func() {
 		// also use the shutdown function when the SIGTERM or SIGINT signals are received
 		sig := <-gracefulStop

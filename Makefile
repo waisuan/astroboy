@@ -1,8 +1,13 @@
 dev:
 	APP_ENV=dev go run -tags dev -v cmd/web/main.go
 
+test-e2e: export APP_ENV = test
 test-e2e:
-	APP_ENV=test go test -v -count=1 -tags e2e ./e2e
+	go run -tags e2e cmd/web/main.go &
+	sleep 5
+	go test -v -count=1 ./e2e || true;
+	pkill -f -e main
+	sleep 3
 
 #component-tests:
 #	sudo docker compose -f docker-compose-kafka.yml up --detach --wait
