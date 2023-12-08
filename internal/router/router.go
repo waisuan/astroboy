@@ -18,6 +18,7 @@ func New(wh *webhandlers.WebHandler) *echo.Echo {
 
 	userGroup := apiGroup.Group("/users")
 	userGroup.GET("/:username/chat-history", wh.GetChatHistory)
+	userGroup.POST("/:username/chat-message", wh.AddChatMessage)
 
 	return e
 }

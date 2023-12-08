@@ -1,14 +1,15 @@
 package e2e
 
 import (
-	"fmt"
+	"astroboy/internal/model"
+	"bytes"
+	"encoding/json"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"testing"
 )
 
 func TestChat(t *testing.T) {
-	//assert := testify.New(t)
 	must := require.New(t)
 
 	//t.Run("GET /:username/chat-history", func(t *testing.T) {
@@ -58,12 +59,32 @@ func TestChat(t *testing.T) {
 		//err := deps.Db.PutItem(context.TODO(), chatMsg)
 		//must.Nil(err)
 
-		req, err := http.NewRequest(http.MethodGet, "http://localhost:5000/api/users/esia/chat-history", nil)
+		body := []byte(`{
+			"body": "Hello, world!"
+		}`)
+		req, err := http.NewRequest(http.MethodPost, "http://localhost:5000/api/users/esia/chat-message", bytes.NewBuffer(body))
 		must.Nil(err)
+
+		req.Header.Add("Content-Type", "application/json")
 
 		res, err := http.DefaultClient.Do(req)
 		must.Nil(err)
+		must.Equal(http.StatusCreated, res.StatusCode)
 
-		fmt.Println(res)
+		req, err = http.NewRequest(http.MethodGet, "http://localhost:5000/api/users/esia/chat-history", nil)
+		must.Nil(err)
+
+		req.Header.Add("Content-Type", "application/json")
+
+		res, err = http.DefaultClient.Do(req)
+		must.Nil(err)
+
+		var chatMsg []model.ChatMessage
+		err = json.NewDecoder(res.Body).Decode(&chatMsg)
+		must.Nil(err)
+
+		must.Len(chatMsg, 1)
+		must.Equal("Hello, world!", chatMsg[0].Body)
+		must.Equal("esia", chatMsg[0].UserId)
 	})
 }

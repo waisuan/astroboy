@@ -6,6 +6,7 @@ import (
 	"context"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
+	"github.com/google/uuid"
 	"time"
 )
 
@@ -39,4 +40,13 @@ func (hs *HistoryService) ForUser(userId string) ([]model.ChatMessage, error) {
 	}
 
 	return chatMessages, nil
+}
+
+func (hs *HistoryService) AddChatMessage(userId string, chatMsg *model.ChatMessage) error {
+	chatMsg.MessageId = uuid.NewString()
+	chatMsg.CreatedAt = time.Now().UnixNano()
+	chatMsg.UserId = userId
+	chatMsg.ConvoId = uuid.NewString()
+
+	return hs.deps.Db.PutItem(context.TODO(), chatMsg)
 }
