@@ -28,7 +28,7 @@ func (hs *HistoryService) ForUser(userId string) ([]model.ChatMessage, error) {
 		return nil, err
 	}
 
-	out, err := hs.deps.Db.QueryWithIndex(ctx, dependencies.UserGsiName, expr)
+	out, err := hs.deps.DB.QueryWithIndex(ctx, dependencies.UserGsiName, expr)
 	if err != nil {
 		return nil, err
 	}
@@ -48,5 +48,5 @@ func (hs *HistoryService) AddChatMessage(userId string, chatMsg *model.ChatMessa
 	chatMsg.UserId = userId
 	chatMsg.ConvoId = uuid.NewString()
 
-	return hs.deps.Db.PutItem(context.TODO(), chatMsg)
+	return hs.deps.DB.PutItem(context.TODO(), chatMsg)
 }

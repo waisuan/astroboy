@@ -23,12 +23,14 @@ const (
 type IDatabase interface {
 	QueryWithIndex(ctx context.Context, indexName string, expr expression.Expression) (DbQueryOutput, error)
 	PutItem(ctx context.Context, input interface{}) error
+	ClearTable(ctx context.Context) error
 }
 
 type DbQueryOutput []map[string]types.AttributeValue
 
 type DB struct {
 	Client         *dynamodb.Client
+	Config         *Config
 	TableName      string
 	UserIndexName  string
 	ConvoIndexName string
@@ -60,6 +62,7 @@ func InitDB(cfg *Config) *DB {
 		TableName:      cfg.DbTableName,
 		UserIndexName:  UserGsiName,
 		ConvoIndexName: ConvoGsiName,
+		Config:         cfg,
 	}
 }
 
@@ -69,10 +72,7 @@ func InitDB(cfg *Config) *DB {
 func createTable(svc *dynamodb.Client, tableName string) error {
 	o, _ := svc.DescribeTable(ctx, &dynamodb.DescribeTableInput{TableName: aws.String(tableName)})
 	if o != nil && o.Table.TableStatus == types.TableStatusActive {
-		_, err := svc.DeleteTable(ctx, &dynamodb.DeleteTableInput{TableName: aws.String(tableName)})
-		if err != nil {
-			return errors.Wrap(err, "failed to drop table")
-		}
+		return nil
 	}
 
 	_, err := svc.CreateTable(ctx, &dynamodb.CreateTableInput{
@@ -137,10 +137,6 @@ func createTable(svc *dynamodb.Client, tableName string) error {
 		TableName:   aws.String(tableName),
 		BillingMode: types.BillingModePayPerRequest,
 	})
-	//, func(options *dynamodb.Options) {
-	//	options.Retryer = retry.AddWithErrorCodes(options.Retryer, (*types.ResourceInUseException)(nil).ErrorCode())
-	//	options.Retryer = retry.AddWithMaxAttempts(options.Retryer, 0)
-	//}
 
 	if err != nil {
 		return errors.Wrap(err, "failed to create table")
@@ -160,6 +156,40 @@ func createTable(svc *dynamodb.Client, tableName string) error {
 	)
 	if err != nil {
 		return errors.Wrap(err, "timed out while waiting for table to become active")
+	}
+
+	return nil
+}
+
+func (db *DB) ClearTable(ctx context.Context) error {
+	if !db.Config.DevMode {
+		return errors.New("unable to run command when in non-dev mode")
+	}
+
+	_, err := db.Client.DeleteTable(ctx, &dynamodb.DeleteTableInput{TableName: aws.String(db.TableName)})
+	if err != nil {
+		return errors.Wrap(err, "failed to delete table")
+	}
+
+	w := dynamodb.NewTableNotExistsWaiter(db.Client)
+	err = w.Wait(
+		ctx,
+		&dynamodb.DescribeTableInput{
+			TableName: aws.String(db.TableName),
+		},
+		2*time.Minute,
+		func(o *dynamodb.TableNotExistsWaiterOptions) {
+			o.MaxDelay = 5 * time.Second
+			o.MinDelay = 5 * time.Second
+		},
+	)
+	if err != nil {
+		return errors.Wrap(err, "timed out while waiting for table to become inactive")
+	}
+
+	err = createTable(db.Client, db.TableName)
+	if err != nil {
+		return errors.Wrap(err, "failed to recreate table")
 	}
 
 	return nil

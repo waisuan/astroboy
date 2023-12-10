@@ -9,7 +9,7 @@ type Dependencies struct {
 	CacheCli ICache
 	SqsCli   *SqsCli
 	KafkaCli *KafkaCli
-	Db       IDatabase
+	DB       IDatabase
 }
 
 func Init() *Dependencies {
@@ -18,8 +18,7 @@ func Init() *Dependencies {
 	//sqsCli := NewSqsCli(cfg)
 	//
 	//kafkaCli := NewKafkaCli(cfg)
-	//
-	//cacheCli := NewCache(cfg)
+	cacheCli := NewCache(cfg)
 
 	db := InitDB(cfg)
 
@@ -27,7 +26,7 @@ func Init() *Dependencies {
 		Config: cfg,
 		//SqsCli:   sqsCli,
 		//KafkaCli: kafkaCli,
-		//CacheCli: cacheCli,
-		Db: db,
+		CacheCli: cacheCli,
+		DB:       db,
 	}
 }

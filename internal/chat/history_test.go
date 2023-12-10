@@ -2,6 +2,7 @@ package chat
 
 import (
 	"astroboy/internal/dependencies"
+	"astroboy/internal/mocks"
 	"errors"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/golang/mock/gomock"
@@ -18,10 +19,10 @@ func TestHistoryService_ForUser(t *testing.T) {
 		mockCtrl := gomock.NewController(t)
 		defer mockCtrl.Finish()
 
-		mockDb := dependencies.NewMockIDatabase(mockCtrl)
+		mockDb := mocks.NewMockIDatabase(mockCtrl)
 		mockDb.EXPECT().QueryWithIndex(gomock.Any(), dependencies.UserGsiName, gomock.Any()).Return(nil, nil)
 
-		h := NewHistoryService(&dependencies.Dependencies{Db: mockDb})
+		h := NewHistoryService(&dependencies.Dependencies{DB: mockDb})
 
 		out, err := h.ForUser("esia")
 		assert.Nil(err)
@@ -32,7 +33,7 @@ func TestHistoryService_ForUser(t *testing.T) {
 		mockCtrl := gomock.NewController(t)
 		defer mockCtrl.Finish()
 
-		mockDb := dependencies.NewMockIDatabase(mockCtrl)
+		mockDb := mocks.NewMockIDatabase(mockCtrl)
 		mockDb.EXPECT().QueryWithIndex(gomock.Any(), dependencies.UserGsiName, gomock.Any()).Return(dependencies.DbQueryOutput{
 			{
 				"message_id": &types.AttributeValueMemberS{Value: "test123"},
@@ -40,7 +41,7 @@ func TestHistoryService_ForUser(t *testing.T) {
 			},
 		}, nil)
 
-		h := NewHistoryService(&dependencies.Dependencies{Db: mockDb})
+		h := NewHistoryService(&dependencies.Dependencies{DB: mockDb})
 
 		out, err := h.ForUser("esia")
 		assert.Nil(err)
@@ -53,10 +54,10 @@ func TestHistoryService_ForUser(t *testing.T) {
 		mockCtrl := gomock.NewController(t)
 		defer mockCtrl.Finish()
 
-		mockDb := dependencies.NewMockIDatabase(mockCtrl)
+		mockDb := mocks.NewMockIDatabase(mockCtrl)
 		mockDb.EXPECT().QueryWithIndex(gomock.Any(), dependencies.UserGsiName, gomock.Any()).Return(nil, errors.New("something bad happened..."))
 
-		h := NewHistoryService(&dependencies.Dependencies{Db: mockDb})
+		h := NewHistoryService(&dependencies.Dependencies{DB: mockDb})
 
 		out, err := h.ForUser("esia")
 		must.NotNil(err)
