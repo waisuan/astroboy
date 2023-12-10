@@ -11,6 +11,12 @@ test-e2e:
 	pkill -f -e main
 	sudo docker compose -f docker-compose-storage.yml down
 
+deps:
+	sudo docker compose -f docker-compose-storage.yml up --detach --wait
+
+teardown:
+	sudo docker compose -f docker-compose-storage.yml down
+
 #component-tests:
 #	sudo docker compose -f docker-compose-kafka.yml up --detach --wait
 #	sudo docker compose -f docker-compose-localstack.yml up --detach --wait
