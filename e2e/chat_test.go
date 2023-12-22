@@ -20,17 +20,33 @@ func TestChat(t *testing.T) {
 
 	deps := dependencies.Init()
 
+	userId := "esia"
+
 	clearStorage := func() {
 		err := deps.DB.ClearTable(context.Background())
 		must.Nil(err)
 	}
 
+	login := func(username string) string {
+		body := []byte(fmt.Sprintf(`{
+			"username": "%s"
+		}`, username))
+		req, _ := http.NewRequest(http.MethodPost, "http://localhost:5000/login", bytes.NewBuffer(body))
+		res, _ := http.DefaultClient.Do(req)
+
+		token := make(map[string]interface{})
+		_ = json.NewDecoder(res.Body).Decode(&token)
+
+		return token["token"].(string)
+	}
+
 	t.Run("GET /:username/chat-history - has chat messages", func(t *testing.T) {
 		defer clearStorage()
 
-		userId := "esia"
 		convoId := uuid.New().String()
 		numOfMessages := 5
+
+		authToken := login(userId)
 
 		for i := 0; i < numOfMessages; i++ {
 			chatMsg := model.ChatMessage{
@@ -46,6 +62,8 @@ func TestChat(t *testing.T) {
 
 		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://localhost:5000/api/users/%s/chat-history", userId), nil)
 		must.Nil(err)
+
+		req.Header.Add("Authorization", "Bearer "+authToken)
 
 		res, err := http.DefaultClient.Do(req)
 		must.Nil(err)
@@ -68,8 +86,14 @@ func TestChat(t *testing.T) {
 	t.Run("GET /:username/chat-history - has no chat messages", func(t *testing.T) {
 		defer clearStorage()
 
-		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://localhost:5000/api/users/%s/chat-history", "rando"), nil)
+		userId = "rando"
+
+		authToken := login(userId)
+
+		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://localhost:5000/api/users/%s/chat-history", userId), nil)
 		must.Nil(err)
+
+		req.Header.Add("Authorization", "Bearer "+authToken)
 
 		res, err := http.DefaultClient.Do(req)
 		must.Nil(err)
@@ -84,13 +108,16 @@ func TestChat(t *testing.T) {
 	t.Run("POST /:username/chat-history - successful", func(t *testing.T) {
 		defer clearStorage()
 
+		authToken := login(userId)
+
 		body := []byte(`{
 			"body": "Hello, world!"
 		}`)
-		req, err := http.NewRequest(http.MethodPost, "http://localhost:5000/api/users/esia/chat-message", bytes.NewBuffer(body))
+		req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("http://localhost:5000/api/users/%s/chat-message", userId), bytes.NewBuffer(body))
 		must.Nil(err)
 
 		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Authorization", "Bearer "+authToken)
 
 		res, err := http.DefaultClient.Do(req)
 		must.Nil(err)
@@ -100,14 +127,17 @@ func TestChat(t *testing.T) {
 	t.Run("POST /:username/chat-history - malformed request", func(t *testing.T) {
 		defer clearStorage()
 
+		authToken := login(userId)
+
 		body := []byte(`Hello, world!`)
-		req, err := http.NewRequest(http.MethodPost, "http://localhost:5000/api/users/esia/chat-message", bytes.NewBuffer(body))
+		req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("http://localhost:5000/api/users/%s/chat-message", userId), bytes.NewBuffer(body))
 		must.Nil(err)
 
 		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Authorization", "Bearer "+authToken)
 
 		res, err := http.DefaultClient.Do(req)
 		must.Nil(err)
-		must.Equal(http.StatusInternalServerError, res.StatusCode)
+		must.Equal(http.StatusBadRequest, res.StatusCode)
 	})
 }

@@ -46,6 +46,7 @@ func (wh *WebHandler) Login(c echo.Context) error {
 
 	username := creds["username"]
 	//password := creds["password"]
+	// TODO: properly authenticate against existing user
 
 	token, err := auth.GenerateJwtToken(username.(string), wh.deps.Config.JwtSigningKey)
 	if err != nil {
