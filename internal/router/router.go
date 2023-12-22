@@ -1,21 +1,24 @@
 package router
 
 import (
-	custommiddleware "astroboy/internal/router/middlewares"
+	"astroboy/internal/dependencies"
+	"astroboy/internal/router/middlewares"
 	"astroboy/internal/webhandlers"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func New(wh *webhandlers.WebHandler) *echo.Echo {
+func New(wh *webhandlers.WebHandler, cfg *dependencies.Config) *echo.Echo {
 	e := echo.New()
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.Timeout())
-	e.Use(custommiddleware.Authentication())
+
+	e.POST("/login", wh.Login)
 
 	apiGroup := e.Group("/api")
+	apiGroup.Use(middlewares.Authenticator(cfg.JwtSigningKey))
 
 	userGroup := apiGroup.Group("/users")
 	userGroup.GET("/:username/chat-history", wh.GetChatHistory)

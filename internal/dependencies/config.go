@@ -22,6 +22,7 @@ type Config struct {
 	DbTableName           string `env:"DB_TABLE_NAME" envDefault:"astroboy-store"`
 	DbHost                string `env:"DB_HOST" envDefault:"localhost"`
 	DbPort                string `env:"DB_PORT" envDefault:"8000"`
+	JwtSigningKey         string `env:"JWT_SIGNING_KEY" envDefault:"secret"`
 }
 
 func LoadEnv() *Config {
