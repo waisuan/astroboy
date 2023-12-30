@@ -16,6 +16,7 @@ func New(wh *webhandlers.WebHandler, cfg *dependencies.Config) *echo.Echo {
 	e.Use(middleware.Timeout())
 
 	e.POST("/login", wh.Login)
+	e.POST("/register", wh.Register)
 
 	apiGroup := e.Group("/api")
 	apiGroup.Use(middlewares.Authenticator(cfg.JwtSigningKey))

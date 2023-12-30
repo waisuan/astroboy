@@ -51,17 +51,17 @@ func (mr *MockIDatabaseMockRecorder) ClearTable(ctx interface{}) *gomock.Call {
 }
 
 // PutItem mocks base method.
-func (m *MockIDatabase) PutItem(ctx context.Context, input interface{}) error {
+func (m *MockIDatabase) PutItem(ctx context.Context, input interface{}, expr *expression.Expression) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PutItem", ctx, input)
+	ret := m.ctrl.Call(m, "PutItem", ctx, input, expr)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // PutItem indicates an expected call of PutItem.
-func (mr *MockIDatabaseMockRecorder) PutItem(ctx, input interface{}) *gomock.Call {
+func (mr *MockIDatabaseMockRecorder) PutItem(ctx, input, expr interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PutItem", reflect.TypeOf((*MockIDatabase)(nil).PutItem), ctx, input)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PutItem", reflect.TypeOf((*MockIDatabase)(nil).PutItem), ctx, input, expr)
 }
 
 // QueryWithIndex mocks base method.

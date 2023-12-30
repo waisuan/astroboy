@@ -7,6 +7,16 @@ import (
 	"testing"
 )
 
+func TestAuthService_RegisterUser(t *testing.T) {
+	t.Run("add new user to the DB", func(t *testing.T) {
+
+	})
+
+	t.Run("add existing user to the DB", func(t *testing.T) {
+
+	})
+}
+
 func TestGenerateJwtToken(t *testing.T) {
 	t.Run("generates a valid JWT token", func(t *testing.T) {
 		signingKey := "secret"

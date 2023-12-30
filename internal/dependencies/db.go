@@ -18,11 +18,12 @@ const (
 	UserGsiName  = "USER_GSI"
 	ConvoGsiName = "CONVO_GSI"
 	UserGsiPKey  = "user_id"
+	PartitionKey = "id"
 )
 
 type IDatabase interface {
 	QueryWithIndex(ctx context.Context, indexName string, expr expression.Expression) (DbQueryOutput, error)
-	PutItem(ctx context.Context, input interface{}) error
+	PutItem(ctx context.Context, input interface{}, expr *expression.Expression) error
 	ClearTable(ctx context.Context) error
 }
 
@@ -78,11 +79,11 @@ func createTable(svc *dynamodb.Client, tableName string) error {
 	_, err := svc.CreateTable(ctx, &dynamodb.CreateTableInput{
 		AttributeDefinitions: []types.AttributeDefinition{
 			{
-				AttributeName: aws.String("message_id"),
+				AttributeName: aws.String("id"),
 				AttributeType: types.ScalarAttributeTypeS,
 			},
 			{
-				AttributeName: aws.String("created_at"),
+				AttributeName: aws.String("timestamp"),
 				AttributeType: types.ScalarAttributeTypeN,
 			},
 			{
@@ -96,11 +97,11 @@ func createTable(svc *dynamodb.Client, tableName string) error {
 		},
 		KeySchema: []types.KeySchemaElement{
 			{
-				AttributeName: aws.String("message_id"),
+				AttributeName: aws.String("id"),
 				KeyType:       types.KeyTypeHash,
 			},
 			{
-				AttributeName: aws.String("created_at"),
+				AttributeName: aws.String("timestamp"),
 				KeyType:       types.KeyTypeRange,
 			},
 		},
@@ -113,7 +114,7 @@ func createTable(svc *dynamodb.Client, tableName string) error {
 						KeyType:       types.KeyTypeHash,
 					},
 					{
-						AttributeName: aws.String("created_at"),
+						AttributeName: aws.String("timestamp"),
 						KeyType:       types.KeyTypeRange,
 					},
 				},
@@ -127,7 +128,7 @@ func createTable(svc *dynamodb.Client, tableName string) error {
 						KeyType:       types.KeyTypeHash,
 					},
 					{
-						AttributeName: aws.String("created_at"),
+						AttributeName: aws.String("timestamp"),
 						KeyType:       types.KeyTypeRange,
 					},
 				},
@@ -210,15 +211,24 @@ func (db *DB) QueryWithIndex(ctx context.Context, indexName string, expr express
 	return response.Items, nil
 }
 
-func (db *DB) PutItem(ctx context.Context, input interface{}) error {
+func (db *DB) PutItem(ctx context.Context, input interface{}, expr *expression.Expression) error {
 	item, err := attributevalue.MarshalMap(input)
 	if err != nil {
 		return err
 	}
 
-	_, err = db.Client.PutItem(ctx, &dynamodb.PutItemInput{
-		TableName: aws.String(db.TableName), Item: item,
-	})
+	queryInput := &dynamodb.PutItemInput{
+		TableName: aws.String(db.TableName),
+		Item:      item,
+	}
+
+	if expr != nil {
+		queryInput.ConditionExpression = expr.Condition()
+		queryInput.ExpressionAttributeNames = expr.Names()
+		queryInput.ExpressionAttributeValues = expr.Values()
+	}
+
+	_, err = db.Client.PutItem(ctx, queryInput)
 
 	return err
 }

@@ -43,10 +43,10 @@ func (hs *HistoryService) ForUser(userId string) ([]model.ChatMessage, error) {
 }
 
 func (hs *HistoryService) AddChatMessage(userId string, chatMsg *model.ChatMessage) error {
-	chatMsg.MessageId = uuid.NewString()
-	chatMsg.CreatedAt = time.Now().UnixNano()
+	chatMsg.Id = uuid.NewString()
+	chatMsg.Timestamp = time.Now().UnixNano()
 	chatMsg.UserId = userId
 	chatMsg.ConvoId = uuid.NewString()
 
-	return hs.deps.DB.PutItem(context.TODO(), chatMsg)
+	return hs.deps.DB.PutItem(context.TODO(), chatMsg, nil)
 }

@@ -38,8 +38,8 @@ func TestHistoryService_ForUser(t *testing.T) {
 		mockDb := mocks.NewMockIDatabase(mockCtrl)
 		mockDb.EXPECT().QueryWithIndex(gomock.Any(), dependencies.UserGsiName, gomock.Any()).Return(dependencies.DbQueryOutput{
 			{
-				"message_id": &types.AttributeValueMemberS{Value: "test123"},
-				"CreatedAt":  &types.AttributeValueMemberN{Value: "0"},
+				"id":        &types.AttributeValueMemberS{Value: "test123"},
+				"timestamp": &types.AttributeValueMemberN{Value: "0"},
 			},
 		}, nil)
 
@@ -48,8 +48,8 @@ func TestHistoryService_ForUser(t *testing.T) {
 		out, err := h.ForUser("esia")
 		assert.Nil(err)
 		must.NotEmpty(out)
-		assert.Equal("test123", out[0].MessageId)
-		assert.Equal(int64(0), out[0].CreatedAt)
+		assert.Equal("test123", out[0].Id)
+		assert.Equal(int64(0), out[0].Timestamp)
 	})
 
 	t.Run("runtime error", func(t *testing.T) {
@@ -75,7 +75,7 @@ func TestHistoryService_AddChatMessage(t *testing.T) {
 		defer mockCtrl.Finish()
 
 		mockDb := mocks.NewMockIDatabase(mockCtrl)
-		mockDb.EXPECT().PutItem(context.TODO(), gomock.AssignableToTypeOf(&model.ChatMessage{})).Return(nil)
+		mockDb.EXPECT().PutItem(context.TODO(), gomock.AssignableToTypeOf(&model.ChatMessage{}), nil).Return(nil)
 
 		h := NewHistoryService(&dependencies.Dependencies{DB: mockDb})
 		err := h.AddChatMessage("esia", &model.ChatMessage{Body: "testing"})
@@ -87,7 +87,7 @@ func TestHistoryService_AddChatMessage(t *testing.T) {
 		defer mockCtrl.Finish()
 
 		mockDb := mocks.NewMockIDatabase(mockCtrl)
-		mockDb.EXPECT().PutItem(context.TODO(), gomock.Any()).Return(errors.New("something bad happened"))
+		mockDb.EXPECT().PutItem(context.TODO(), gomock.Any(), nil).Return(errors.New("something bad happened"))
 
 		h := NewHistoryService(&dependencies.Dependencies{DB: mockDb})
 		err := h.AddChatMessage("esia", &model.ChatMessage{})

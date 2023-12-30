@@ -56,3 +56,24 @@ func (wh *WebHandler) Login(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, echo.Map{"token": token})
 }
+
+func (wh *WebHandler) Register(c echo.Context) error {
+	creds := make(map[string]interface{})
+	err := json.NewDecoder(c.Request().Body).Decode(&creds)
+	if err != nil {
+		log.Error(err)
+		return echo.ErrBadRequest
+	}
+
+	username := creds["username"].(string)
+	password := creds["password"].(string)
+	email := creds["email"].(string)
+
+	err = wh.authService.RegisterUser(username, password, email)
+	if err != nil {
+		log.Error(err)
+		return echo.ErrInternalServerError
+	}
+
+	return c.JSON(http.StatusCreated, nil)
+}

@@ -1,7 +1,9 @@
 package model
 
 type User struct {
-	Username    string `json:"username" param:"username"`
-	Email       string `json:"email"`
-	DateOfBirth string `json:"date_of_birth"`
+	Id           string `dynamodbav:"id" json:"id"`
+	Timestamp    int64  `dynamodbav:"timestamp" json:"timestamp"`
+	Password     string `dynamodbav:"password" json:"-"`
+	Email        string `dynamodbav:"email" json:"email"`
+	RegisteredAt int64  `dynamodbav:"registered_at" json:"registered_at"`
 }

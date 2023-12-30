@@ -11,10 +11,13 @@ test-e2e:
 	pkill -f -e main
 	sudo docker compose -f docker-compose-storage.yml down
 
-deps:
+setup: export APP_ENV = test
+setup:
 	sudo docker compose -f docker-compose-storage.yml up --detach --wait
+	go run cmd/web/main.go &
 
 teardown:
+	pkill -f -e main
 	sudo docker compose -f docker-compose-storage.yml down
 
 #component-tests:

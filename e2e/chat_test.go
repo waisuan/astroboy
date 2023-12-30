@@ -50,13 +50,13 @@ func TestChat(t *testing.T) {
 
 		for i := 0; i < numOfMessages; i++ {
 			chatMsg := model.ChatMessage{
-				MessageId: uuid.New().String(),
-				CreatedAt: time.Now().UnixNano(),
+				Id:        uuid.New().String(),
+				Timestamp: time.Now().UnixNano(),
 				Body:      gofakeit.RandomString([]string{"Hello, world!", "Lorem Ipsum", "How are you?"}),
 				UserId:    userId,
 				ConvoId:   convoId,
 			}
-			err := deps.DB.PutItem(context.TODO(), chatMsg)
+			err := deps.DB.PutItem(context.TODO(), chatMsg, nil)
 			must.Nil(err)
 		}
 
@@ -76,8 +76,8 @@ func TestChat(t *testing.T) {
 
 		for _, m := range chatMessages {
 			must.NotEmpty(m.Body)
-			must.NotEmpty(m.MessageId)
-			must.NotEmpty(m.CreatedAt)
+			must.NotEmpty(m.Id)
+			must.NotEmpty(m.Timestamp)
 			must.NotEmpty(m.ConvoId)
 			must.Equal(userId, m.UserId)
 		}
@@ -139,5 +139,44 @@ func TestChat(t *testing.T) {
 		res, err := http.DefaultClient.Do(req)
 		must.Nil(err)
 		must.Equal(http.StatusBadRequest, res.StatusCode)
+	})
+
+	t.Run("Invalid/Expired JWT authentication token", func(t *testing.T) {
+		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://localhost:5000/api/users/%s/chat-history", userId), nil)
+		must.Nil(err)
+
+		req.Header.Add("Authorization", "Bearer dummy")
+
+		res, err := http.DefaultClient.Do(req)
+		must.Nil(err)
+		must.Equal(http.StatusUnauthorized, res.StatusCode)
+	})
+
+	t.Run("POST /register", func(t *testing.T) {
+		defer clearStorage()
+
+		body := []byte(`{
+			"username": "esia",
+			"password": "dummy",
+			"email": "esia@mail.com"
+		}`)
+		req, err := http.NewRequest(http.MethodPost, "http://localhost:5000/register", bytes.NewBuffer(body))
+		must.Nil(err)
+
+		res, err := http.DefaultClient.Do(req)
+		must.Nil(err)
+		must.Equal(http.StatusCreated, res.StatusCode)
+
+		body = []byte(`{
+			"username": "esia",
+			"password": "dummy",
+			"email": "esia@mail.com"
+		}`)
+		req, err = http.NewRequest(http.MethodPost, "http://localhost:5000/register", bytes.NewBuffer(body))
+		must.Nil(err)
+
+		res, err = http.DefaultClient.Do(req)
+		must.Nil(err)
+		must.Equal(http.StatusInternalServerError, res.StatusCode)
 	})
 }
