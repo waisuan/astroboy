@@ -64,17 +64,17 @@ func (mr *MockIDatabaseMockRecorder) PutItem(ctx, input, expr interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PutItem", reflect.TypeOf((*MockIDatabase)(nil).PutItem), ctx, input, expr)
 }
 
-// QueryWithIndex mocks base method.
-func (m *MockIDatabase) QueryWithIndex(ctx context.Context, indexName string, expr expression.Expression) (dependencies.DbQueryOutput, error) {
+// Query mocks base method.
+func (m *MockIDatabase) Query(ctx context.Context, expr expression.Expression, indexName string) (dependencies.DbQueryOutput, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "QueryWithIndex", ctx, indexName, expr)
+	ret := m.ctrl.Call(m, "Query", ctx, expr, indexName)
 	ret0, _ := ret[0].(dependencies.DbQueryOutput)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// QueryWithIndex indicates an expected call of QueryWithIndex.
-func (mr *MockIDatabaseMockRecorder) QueryWithIndex(ctx, indexName, expr interface{}) *gomock.Call {
+// Query indicates an expected call of Query.
+func (mr *MockIDatabaseMockRecorder) Query(ctx, expr, indexName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryWithIndex", reflect.TypeOf((*MockIDatabase)(nil).QueryWithIndex), ctx, indexName, expr)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockIDatabase)(nil).Query), ctx, expr, indexName)
 }

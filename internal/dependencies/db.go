@@ -22,7 +22,7 @@ const (
 )
 
 type IDatabase interface {
-	QueryWithIndex(ctx context.Context, indexName string, expr expression.Expression) (DbQueryOutput, error)
+	Query(ctx context.Context, expr expression.Expression, indexName string) (DbQueryOutput, error)
 	PutItem(ctx context.Context, input interface{}, expr *expression.Expression) error
 	ClearTable(ctx context.Context) error
 }
@@ -196,14 +196,19 @@ func (db *DB) ClearTable(ctx context.Context) error {
 	return nil
 }
 
-func (db *DB) QueryWithIndex(ctx context.Context, indexName string, expr expression.Expression) (DbQueryOutput, error) {
-	response, err := db.Client.Query(ctx, &dynamodb.QueryInput{
+func (db *DB) Query(ctx context.Context, expr expression.Expression, indexName string) (DbQueryOutput, error) {
+	queryInput := &dynamodb.QueryInput{
 		TableName:                 aws.String(db.TableName),
-		IndexName:                 aws.String(indexName),
 		ExpressionAttributeNames:  expr.Names(),
 		ExpressionAttributeValues: expr.Values(),
 		KeyConditionExpression:    expr.KeyCondition(),
-	})
+	}
+
+	if indexName != "" {
+		queryInput.IndexName = aws.String(indexName)
+	}
+
+	response, err := db.Client.Query(ctx, queryInput)
 	if err != nil {
 		return nil, err
 	}

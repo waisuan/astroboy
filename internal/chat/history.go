@@ -28,7 +28,7 @@ func (hs *HistoryService) ForUser(userId string) ([]model.ChatMessage, error) {
 		return nil, err
 	}
 
-	out, err := hs.deps.DB.QueryWithIndex(ctx, dependencies.UserGsiName, expr)
+	out, err := hs.deps.DB.Query(ctx, expr, dependencies.UserGsiName)
 	if err != nil {
 		return nil, err
 	}

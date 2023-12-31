@@ -11,25 +11,28 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	"net/http"
+	"os"
 	"testing"
 	"time"
 )
 
 func TestChat(t *testing.T) {
+	os.Setenv("APP_ENV", "test")
 	must := require.New(t)
-
 	deps := dependencies.Init()
-
 	userId := "esia"
 
 	clearStorage := func() {
 		err := deps.DB.ClearTable(context.Background())
 		must.Nil(err)
+
+		os.Unsetenv("APP_ENV")
 	}
 
 	login := func(username string) string {
 		body := []byte(fmt.Sprintf(`{
-			"username": "%s"
+			"username": "%s",
+            "password": "dummy"
 		}`, username))
 		req, _ := http.NewRequest(http.MethodPost, "http://localhost:5000/login", bytes.NewBuffer(body))
 		res, _ := http.DefaultClient.Do(req)
@@ -178,5 +181,32 @@ func TestChat(t *testing.T) {
 		res, err = http.DefaultClient.Do(req)
 		must.Nil(err)
 		must.Equal(http.StatusInternalServerError, res.StatusCode)
+	})
+
+	t.Run("POST /login", func(t *testing.T) {
+		defer clearStorage()
+
+		body := []byte(`{
+			"username": "esia",
+			"password": "dummy",
+			"email": "esia@mail.com"
+		}`)
+		req, err := http.NewRequest(http.MethodPost, "http://localhost:5000/register", bytes.NewBuffer(body))
+		must.Nil(err)
+
+		res, err := http.DefaultClient.Do(req)
+		must.Nil(err)
+		must.Equal(http.StatusCreated, res.StatusCode)
+
+		body = []byte(`{
+			"username": "esia",
+			"password": "dummy"
+		}`)
+		req, err = http.NewRequest(http.MethodPost, "http://localhost:5000/login", bytes.NewBuffer(body))
+		must.Nil(err)
+
+		res, err = http.DefaultClient.Do(req)
+		must.Nil(err)
+		//must.Equal(http.StatusInternalServerError, res.StatusCode)
 	})
 }

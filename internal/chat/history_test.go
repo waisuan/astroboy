@@ -22,7 +22,7 @@ func TestHistoryService_ForUser(t *testing.T) {
 		defer mockCtrl.Finish()
 
 		mockDb := mocks.NewMockIDatabase(mockCtrl)
-		mockDb.EXPECT().QueryWithIndex(gomock.Any(), dependencies.UserGsiName, gomock.Any()).Return(nil, nil)
+		mockDb.EXPECT().Query(gomock.Any(), gomock.Any(), dependencies.UserGsiName).Return(nil, nil)
 
 		h := NewHistoryService(&dependencies.Dependencies{DB: mockDb})
 
@@ -36,7 +36,7 @@ func TestHistoryService_ForUser(t *testing.T) {
 		defer mockCtrl.Finish()
 
 		mockDb := mocks.NewMockIDatabase(mockCtrl)
-		mockDb.EXPECT().QueryWithIndex(gomock.Any(), dependencies.UserGsiName, gomock.Any()).Return(dependencies.DbQueryOutput{
+		mockDb.EXPECT().Query(gomock.Any(), gomock.Any(), dependencies.UserGsiName).Return(dependencies.DbQueryOutput{
 			{
 				"id":        &types.AttributeValueMemberS{Value: "test123"},
 				"timestamp": &types.AttributeValueMemberN{Value: "0"},
@@ -57,7 +57,7 @@ func TestHistoryService_ForUser(t *testing.T) {
 		defer mockCtrl.Finish()
 
 		mockDb := mocks.NewMockIDatabase(mockCtrl)
-		mockDb.EXPECT().QueryWithIndex(gomock.Any(), dependencies.UserGsiName, gomock.Any()).Return(nil, errors.New("something bad happened"))
+		mockDb.EXPECT().Query(gomock.Any(), gomock.Any(), dependencies.UserGsiName).Return(nil, errors.New("something bad happened"))
 
 		h := NewHistoryService(&dependencies.Dependencies{DB: mockDb})
 

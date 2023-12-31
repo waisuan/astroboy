@@ -4,6 +4,8 @@ import (
 	"astroboy/internal/dependencies"
 	"astroboy/internal/model"
 	"context"
+	"errors"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -44,6 +46,41 @@ func (as *AuthService) RegisterUser(username string, password string, email stri
 	}
 
 	return as.deps.DB.PutItem(context.TODO(), u, &expr)
+}
+
+func (as *AuthService) LoginUser(username string, password string) error {
+	ctx, cancel := context.WithTimeout(context.TODO(), 1*time.Second)
+	defer cancel()
+
+	keyEx := expression.Key(dependencies.PartitionKey).Equal(expression.Value(username))
+	expr, err := expression.NewBuilder().WithKeyCondition(keyEx).Build()
+	if err != nil {
+		return err
+	}
+
+	out, err := as.deps.DB.Query(ctx, expr, "")
+	if err != nil {
+		return err
+	}
+
+	var users []model.User
+	err = attributevalue.UnmarshalListOfMaps(out, &users)
+	if err != nil {
+		return err
+	}
+
+	if len(users) != 1 {
+		return errors.New("unable to locate user record in DB")
+	}
+
+	user := users[0]
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func GenerateJwtToken(username string, signingKey string) (string, error) {

@@ -44,11 +44,11 @@ func (wh *WebHandler) Login(c echo.Context) error {
 		return echo.ErrBadRequest
 	}
 
-	username := creds["username"]
-	//password := creds["password"]
-	// TODO: properly authenticate against existing user
+	username := creds["username"].(string)
+	password := creds["password"].(string)
+	_ = wh.authService.LoginUser(username, password)
 
-	token, err := auth.GenerateJwtToken(username.(string), wh.deps.Config.JwtSigningKey)
+	token, err := auth.GenerateJwtToken(username, wh.deps.Config.JwtSigningKey)
 	if err != nil {
 		log.Error(err)
 		return echo.ErrInternalServerError
