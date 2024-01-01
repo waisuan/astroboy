@@ -46,7 +46,11 @@ func (wh *WebHandler) Login(c echo.Context) error {
 
 	username := creds["username"].(string)
 	password := creds["password"].(string)
-	_ = wh.authService.LoginUser(username, password)
+	err = wh.authService.LoginUser(username, password)
+	if err != nil {
+		log.Error(err)
+		return echo.ErrUnauthorized
+	}
 
 	token, err := auth.GenerateJwtToken(username, wh.deps.Config.JwtSigningKey)
 	if err != nil {

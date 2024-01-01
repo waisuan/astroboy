@@ -22,7 +22,7 @@ func TestChat(t *testing.T) {
 	deps := dependencies.Init()
 	userId := "esia"
 
-	clearStorage := func() {
+	teardown := func() {
 		err := deps.DB.ClearTable(context.Background())
 		must.Nil(err)
 
@@ -32,9 +32,19 @@ func TestChat(t *testing.T) {
 	login := func(username string) string {
 		body := []byte(fmt.Sprintf(`{
 			"username": "%s",
+			"password": "dummy",
+			"email": "testing@mail.com"
+		}`, username))
+		req, err := http.NewRequest(http.MethodPost, "http://localhost:5000/register", bytes.NewBuffer(body))
+		must.Nil(err)
+
+		_, _ = http.DefaultClient.Do(req)
+
+		body = []byte(fmt.Sprintf(`{
+			"username": "%s",
             "password": "dummy"
 		}`, username))
-		req, _ := http.NewRequest(http.MethodPost, "http://localhost:5000/login", bytes.NewBuffer(body))
+		req, _ = http.NewRequest(http.MethodPost, "http://localhost:5000/login", bytes.NewBuffer(body))
 		res, _ := http.DefaultClient.Do(req)
 
 		token := make(map[string]interface{})
@@ -44,7 +54,7 @@ func TestChat(t *testing.T) {
 	}
 
 	t.Run("GET /:username/chat-history - has chat messages", func(t *testing.T) {
-		defer clearStorage()
+		defer teardown()
 
 		convoId := uuid.New().String()
 		numOfMessages := 5
@@ -87,7 +97,7 @@ func TestChat(t *testing.T) {
 	})
 
 	t.Run("GET /:username/chat-history - has no chat messages", func(t *testing.T) {
-		defer clearStorage()
+		defer teardown()
 
 		userId = "rando"
 
@@ -109,7 +119,7 @@ func TestChat(t *testing.T) {
 	})
 
 	t.Run("POST /:username/chat-history - successful", func(t *testing.T) {
-		defer clearStorage()
+		defer teardown()
 
 		authToken := login(userId)
 
@@ -128,7 +138,7 @@ func TestChat(t *testing.T) {
 	})
 
 	t.Run("POST /:username/chat-history - malformed request", func(t *testing.T) {
-		defer clearStorage()
+		defer teardown()
 
 		authToken := login(userId)
 
@@ -156,7 +166,7 @@ func TestChat(t *testing.T) {
 	})
 
 	t.Run("POST /register", func(t *testing.T) {
-		defer clearStorage()
+		defer teardown()
 
 		body := []byte(`{
 			"username": "esia",
@@ -184,7 +194,7 @@ func TestChat(t *testing.T) {
 	})
 
 	t.Run("POST /login", func(t *testing.T) {
-		defer clearStorage()
+		defer teardown()
 
 		body := []byte(`{
 			"username": "esia",
@@ -207,6 +217,17 @@ func TestChat(t *testing.T) {
 
 		res, err = http.DefaultClient.Do(req)
 		must.Nil(err)
-		//must.Equal(http.StatusInternalServerError, res.StatusCode)
+		must.Equal(http.StatusOK, res.StatusCode)
+
+		body = []byte(`{
+			"username": "esia",
+			"password": "dummy11111111"
+		}`)
+		req, err = http.NewRequest(http.MethodPost, "http://localhost:5000/login", bytes.NewBuffer(body))
+		must.Nil(err)
+
+		res, err = http.DefaultClient.Do(req)
+		must.Nil(err)
+		must.Equal(http.StatusUnauthorized, res.StatusCode)
 	})
 }
