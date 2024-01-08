@@ -10,6 +10,11 @@ import (
 	"time"
 )
 
+type IHistory interface {
+	ForUser(userId string) ([]model.ChatMessage, error)
+	AddChatMessage(userId string, chatMsg *model.ChatMessage) error
+}
+
 type HistoryService struct {
 	deps *dependencies.Dependencies
 }

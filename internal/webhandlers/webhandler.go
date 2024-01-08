@@ -7,15 +7,15 @@ import (
 )
 
 type WebHandler struct {
-	deps           *dependencies.Dependencies
-	historyService *chat.HistoryService
-	authService    *auth.AuthService
+	Deps           *dependencies.Dependencies
+	HistoryService chat.IHistory
+	AuthService    auth.IAuth
 }
 
 func NewWebHandler(deps *dependencies.Dependencies) *WebHandler {
 	return &WebHandler{
-		deps:           deps,
-		historyService: chat.NewHistoryService(deps),
-		authService:    auth.NewAuthService(deps),
+		Deps:           deps,
+		HistoryService: chat.NewHistoryService(deps),
+		AuthService:    auth.NewAuthService(deps),
 	}
 }

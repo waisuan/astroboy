@@ -9,7 +9,7 @@ import (
 func main() {
 	deps := dependencies.Init()
 	wh := webhandlers.NewWebHandler(deps)
-	r := router.New(wh, deps.Config)
+	r := router.New(wh)
 
 	r.Logger.Fatal(r.Start(":" + deps.Config.WebPort))
 }

@@ -12,6 +12,11 @@ import (
 	"time"
 )
 
+type IAuth interface {
+	RegisterUser(username string, password string, email string) error
+	LoginUser(username string, password string) error
+}
+
 type AuthService struct {
 	deps *dependencies.Dependencies
 }

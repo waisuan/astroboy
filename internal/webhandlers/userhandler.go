@@ -10,7 +10,7 @@ import (
 )
 
 func (wh *WebHandler) GetChatHistory(c echo.Context) error {
-	res, err := wh.historyService.ForUser(c.Param("username"))
+	res, err := wh.HistoryService.ForUser(c.Param("username"))
 	if err != nil {
 		log.Error(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fetch chat history")
@@ -27,7 +27,7 @@ func (wh *WebHandler) AddChatMessage(c echo.Context) error {
 		return echo.ErrBadRequest
 	}
 
-	err = wh.historyService.AddChatMessage(c.Param("username"), &chatMsg)
+	err = wh.HistoryService.AddChatMessage(c.Param("username"), &chatMsg)
 	if err != nil {
 		log.Error(err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to add chat message")
@@ -46,13 +46,13 @@ func (wh *WebHandler) Login(c echo.Context) error {
 
 	username := creds["username"].(string)
 	password := creds["password"].(string)
-	err = wh.authService.LoginUser(username, password)
+	err = wh.AuthService.LoginUser(username, password)
 	if err != nil {
 		log.Error(err)
 		return echo.ErrUnauthorized
 	}
 
-	token, err := auth.GenerateJwtToken(username, wh.deps.Config.JwtSigningKey)
+	token, err := auth.GenerateJwtToken(username, wh.Deps.Config.JwtSigningKey)
 	if err != nil {
 		log.Error(err)
 		return echo.ErrInternalServerError
@@ -73,7 +73,7 @@ func (wh *WebHandler) Register(c echo.Context) error {
 	password := creds["password"].(string)
 	email := creds["email"].(string)
 
-	err = wh.authService.RegisterUser(username, password, email)
+	err = wh.AuthService.RegisterUser(username, password, email)
 	if err != nil {
 		log.Error(err)
 		return echo.ErrInternalServerError
