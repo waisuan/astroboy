@@ -2,8 +2,6 @@ module astroboy
 
 go 1.21
 
-toolchain go1.21.1
-
 require (
 	github.com/99designs/gqlgen v0.17.42
 	github.com/aws/aws-sdk-go v1.45.19
