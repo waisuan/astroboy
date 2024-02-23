@@ -7,17 +7,12 @@ var ctx = context.Background()
 type Dependencies struct {
 	Config   *Config
 	CacheCli ICache
-	SqsCli   *SqsCli
-	KafkaCli *KafkaCli
 	DB       IDatabase
 }
 
 func Init() *Dependencies {
 	cfg := LoadEnv()
 
-	//sqsCli := NewSqsCli(cfg)
-	//
-	//kafkaCli := NewKafkaCli(cfg)
 	cacheCli := NewCache(cfg)
 
 	db := InitDB(cfg)

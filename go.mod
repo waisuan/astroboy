@@ -4,7 +4,6 @@ go 1.21
 
 require (
 	github.com/99designs/gqlgen v0.17.42
-	github.com/aws/aws-sdk-go v1.45.19
 	github.com/aws/aws-sdk-go-v2 v1.23.5
 	github.com/aws/aws-sdk-go-v2/config v1.25.10
 	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.12.9
@@ -22,7 +21,6 @@ require (
 	github.com/labstack/gommon v0.4.0
 	github.com/pkg/errors v0.9.1
 	github.com/redis/go-redis/v9 v9.1.0
-	github.com/segmentio/kafka-go v0.4.42
 	github.com/stretchr/testify v1.8.4
 	github.com/testcontainers/testcontainers-go v0.26.0
 	github.com/vektah/gqlparser/v2 v2.5.10
@@ -80,7 +78,6 @@ require (
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0-rc5 // indirect
 	github.com/opencontainers/runc v1.1.5 // indirect
-	github.com/pierrec/lz4/v4 v4.1.15 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
