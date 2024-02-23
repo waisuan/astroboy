@@ -10,19 +10,14 @@ import (
 )
 
 type Config struct {
-	AwsSqsEndpoint        string `env:"AWS_SQS_ENDPOINT"`
-	AwsRegion             string `env:"AWS_REGION"`
-	SqsQueueUrl           string `env:"SQS_QUEUE_URL"`
-	KafkaBrokerAddr       string `env:"KAFKA_BROKER_ADDR"`
-	KafkaTopic            string `env:"KAFKA_TOPIC"`
-	RedisAddr             string `env:"REDIS_ADDR"`
-	FakeDataPublisherCron string `env:"FAKE_DATA_PUBLISHER_CRON"`
-	WebPort               string `env:"PORT" envDefault:"5000"`
-	DevMode               bool   `env:"DEV_MODE" envDefault:"false"`
-	DbTableName           string `env:"DB_TABLE_NAME" envDefault:"astroboy-store"`
-	DbHost                string `env:"DB_HOST" envDefault:"localhost"`
-	DbPort                string `env:"DB_PORT" envDefault:"8000"`
-	JwtSigningKey         string `env:"JWT_SIGNING_KEY" envDefault:"secret"`
+	AwsRegion     string `env:"AWS_REGION"`
+	RedisAddr     string `env:"REDIS_ADDR"`
+	WebPort       string `env:"PORT" envDefault:"5000"`
+	DevMode       bool   `env:"DEV_MODE" envDefault:"false"`
+	DbTableName   string `env:"DB_TABLE_NAME" envDefault:"astroboy-store"`
+	DbHost        string `env:"DB_HOST" envDefault:"localhost"`
+	DbPort        string `env:"DB_PORT" envDefault:"8000"`
+	JwtSigningKey string `env:"JWT_SIGNING_KEY" envDefault:"secret"`
 }
 
 func LoadEnv() *Config {
