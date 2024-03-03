@@ -1,7 +1,7 @@
 package router
 
 import (
-	gql "astroboy/internal/graph"
+	"astroboy/graph"
 	"astroboy/internal/router/middlewares"
 	"astroboy/internal/webhandlers"
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -17,7 +17,7 @@ func New(wh *webhandlers.WebHandler) *echo.Echo {
 	e.Use(middleware.Recover())
 	e.Use(middleware.Timeout())
 
-	graphqlHandler := handler.NewDefaultServer(gql.NewExecutableSchema(gql.Config{Resolvers: &gql.Resolver{}}))
+	graphqlHandler := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 	playgroundHandler := playground.Handler("GraphQL", "/gql/query")
 
 	gqlGroup := e.Group("/gql")
