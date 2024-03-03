@@ -3,7 +3,7 @@
 package graph
 
 import (
-	"astroboy/graph/model"
+	"astroboy/internal/graph/model"
 	"bytes"
 	"context"
 	"embed"

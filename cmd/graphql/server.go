@@ -1,7 +1,7 @@
 package main
 
 import (
-	"astroboy/graph"
+	gql "astroboy/internal/graph"
 	"log"
 	"net/http"
 	"os"
@@ -18,7 +18,7 @@ func main() {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	srv := handler.NewDefaultServer(gql.NewExecutableSchema(gql.Config{Resolvers: &gql.Resolver{}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)

@@ -10,7 +10,7 @@ import (
 )
 
 type Config struct {
-	AwsRegion     string `env:"AWS_REGION"`
+	AwsRegion     string `env:"AWS_REGION" envDefault:"eu-west-1"`
 	RedisAddr     string `env:"REDIS_ADDR"`
 	WebPort       string `env:"PORT" envDefault:"5000"`
 	DevMode       bool   `env:"DEV_MODE" envDefault:"false"`
